@@ -1,3 +1,7 @@
+/*
+ *  AUTHOR: LISY
+*/
+
 To set Pass/Fail:
 mysql> use student;
 Database changed
