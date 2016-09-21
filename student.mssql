@@ -1,0 +1,289 @@
+-- MySQL dump 10.13  Distrib 5.6.17, for Win64 (x86_64)
+--
+-- Host: localhost    Database: student
+-- ------------------------------------------------------
+-- Server version	5.6.17
+
+/*!40101 SET @OLD_CHARACTER_SET_CLIENT=@@CHARACTER_SET_CLIENT */;
+/*!40101 SET @OLD_CHARACTER_SET_RESULTS=@@CHARACTER_SET_RESULTS */;
+/*!40101 SET @OLD_COLLATION_CONNECTION=@@COLLATION_CONNECTION */;
+/*!40101 SET NAMES utf8 */;
+/*!40103 SET @OLD_TIME_ZONE=@@TIME_ZONE */;
+/*!40103 SET TIME_ZONE='+00:00' */;
+/*!40014 SET @OLD_UNIQUE_CHECKS=@@UNIQUE_CHECKS, UNIQUE_CHECKS=0 */;
+/*!40014 SET @OLD_FOREIGN_KEY_CHECKS=@@FOREIGN_KEY_CHECKS, FOREIGN_KEY_CHECKS=0 */;
+/*!40101 SET @OLD_SQL_MODE=@@SQL_MODE, SQL_MODE='NO_AUTO_VALUE_ON_ZERO' */;
+/*!40111 SET @OLD_SQL_NOTES=@@SQL_NOTES, SQL_NOTES=0 */;
+
+--
+-- Table structure for table `address`
+--
+
+DROP TABLE IF EXISTS `address`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `address` (
+  `id` int(11) NOT NULL,
+  `addr_id` bigint(20) NOT NULL,
+  `street` varchar(20) NOT NULL,
+  `city` varchar(20) NOT NULL,
+  `state` varchar(20) NOT NULL,
+  `country` varchar(20) NOT NULL,
+  `postal_code` int(20) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `address`
+--
+
+LOCK TABLES `address` WRITE;
+/*!40000 ALTER TABLE `address` DISABLE KEYS */;
+INSERT INTO `address` VALUES (1,201,'NSB Road','Trichy','Tamil Nadu','India',621711),(2,202,'NS Street','Amaravathy','Andhra Pradhesh','India',522101),(3,203,'YN Street','Kochi','Kerala','India',682001),(4,204,'11th Cross Street','Tanjore','Tamil Nadu','India',622732),(5,205,'BHC Street','Chennai','Tamil Nadu','India',600031);
+/*!40000 ALTER TABLE `address` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `b`
+--
+
+DROP TABLE IF EXISTS `b`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `b` (
+  `user_id` int(11) DEFAULT NULL,
+  `classroom_id` int(11) DEFAULT NULL,
+  `course` int(11) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `b`
+--
+
+LOCK TABLES `b` WRITE;
+/*!40000 ALTER TABLE `b` DISABLE KEYS */;
+INSERT INTO `b` VALUES (1,5,3),(1,5,4),(1,6,2);
+/*!40000 ALTER TABLE `b` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `course_details`
+--
+
+DROP TABLE IF EXISTS `course_details`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `course_details` (
+  `course_id` int(20) NOT NULL,
+  `course_name` varchar(40) NOT NULL,
+  `no_of_sems` int(10) NOT NULL,
+  PRIMARY KEY (`course_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `course_details`
+--
+
+LOCK TABLES `course_details` WRITE;
+/*!40000 ALTER TABLE `course_details` DISABLE KEYS */;
+INSERT INTO `course_details` VALUES (401,'BCA',6),(402,'B.Com',6),(403,'BBA',6);
+/*!40000 ALTER TABLE `course_details` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `courses`
+--
+
+DROP TABLE IF EXISTS `courses`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `courses` (
+  `id` int(11) DEFAULT NULL,
+  `course` varchar(20) DEFAULT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `courses`
+--
+
+LOCK TABLES `courses` WRITE;
+/*!40000 ALTER TABLE `courses` DISABLE KEYS */;
+INSERT INTO `courses` VALUES (1,'Math'),(2,'History'),(3,'Geography'),(4,'Computer');
+/*!40000 ALTER TABLE `courses` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `results`
+--
+
+DROP TABLE IF EXISTS `results`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `results` (
+  `result_id` int(20) NOT NULL,
+  `stud_id` bigint(20) NOT NULL,
+  `course_id` int(20) NOT NULL,
+  `subject_id` int(20) NOT NULL,
+  `mark` int(5) NOT NULL,
+  `grade` varchar(10) NOT NULL,
+  `result` tinyint(1) NOT NULL,
+  `status` varchar(30) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `results`
+--
+
+LOCK TABLES `results` WRITE;
+/*!40000 ALTER TABLE `results` DISABLE KEYS */;
+INSERT INTO `results` VALUES (601,101,401,511,85,'A',1,'Pass'),(601,101,401,513,40,'U',0,'Fail'),(602,102,403,512,90,'A',1,'Pass'),(602,102,403,514,60,'C',1,'Pass'),(603,103,402,512,65,'C',1,'Pass'),(603,103,402,514,35,'U',0,'Fail'),(604,104,401,511,70,'B',1,'Pass'),(604,104,401,513,80,'A',1,'Pass'),(605,105,403,512,30,'U',0,'Fail'),(605,105,403,514,35,'U',0,'Fail'),(606,106,402,512,35,'U',0,'Fail'),(606,106,402,514,70,'C',1,'Pass'),(607,107,401,511,70,'C',1,'Pass'),(607,107,401,513,80,'B',1,'Pass');
+/*!40000 ALTER TABLE `results` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `stud_addr`
+--
+
+DROP TABLE IF EXISTS `stud_addr`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `stud_addr` (
+  `id` int(20) NOT NULL,
+  `stud_id` bigint(20) NOT NULL,
+  `addr_id` bigint(20) NOT NULL,
+  `type` varchar(30) NOT NULL,
+  PRIMARY KEY (`id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `stud_addr`
+--
+
+LOCK TABLES `stud_addr` WRITE;
+/*!40000 ALTER TABLE `stud_addr` DISABLE KEYS */;
+INSERT INTO `stud_addr` VALUES (1,101,203,'Permanent'),(2,102,201,'Permanent'),(3,102,203,'Temporary'),(4,103,202,'Permanent'),(5,105,204,'permanent'),(6,106,201,'permanent'),(7,107,205,'Permanent'),(8,108,205,'Permanent');
+/*!40000 ALTER TABLE `stud_addr` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `stud_master`
+--
+
+DROP TABLE IF EXISTS `stud_master`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `stud_master` (
+  `stud_id` bigint(20) NOT NULL DEFAULT '0',
+  `stud_reg_no` int(20) NOT NULL,
+  `stud_name` varchar(40) NOT NULL,
+  `dob` date NOT NULL,
+  `father_name` varchar(30) NOT NULL,
+  `mother_name` varchar(30) NOT NULL,
+  `blood_group` varchar(40) NOT NULL,
+  `academic_year` year(4) DEFAULT NULL,
+  PRIMARY KEY (`stud_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `stud_master`
+--
+
+LOCK TABLES `stud_master` WRITE;
+/*!40000 ALTER TABLE `stud_master` DISABLE KEYS */;
+INSERT INTO `stud_master` VALUES (101,811,'aaa','1992-09-23','sss','rrr','B+ve',2011),(102,812,'bbb','1990-07-10','yyy','lll','O+ve',2009),(103,813,'ccc','1995-01-02','mmm','jjj','A+ve',2014),(104,814,'ddd','1991-09-25','rrr','mmm','A1B+ve',2011),(105,815,'eee','1990-06-26','nnn','sss','O+ve',2009),(106,816,'fff','1994-03-15','sss','jjj','O-ve',2014),(107,817,'ggg','1992-05-02','ppp','sss','B+ve',2011);
+/*!40000 ALTER TABLE `stud_master` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `stud_meta`
+--
+
+DROP TABLE IF EXISTS `stud_meta`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `stud_meta` (
+  `stud_id` bigint(20) NOT NULL,
+  `allocation_id` int(20) NOT NULL,
+  `contact_no` bigint(30) NOT NULL,
+  `email_id` varchar(30) NOT NULL,
+  PRIMARY KEY (`stud_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `stud_meta`
+--
+
+LOCK TABLES `stud_meta` WRITE;
+/*!40000 ALTER TABLE `stud_meta` DISABLE KEYS */;
+INSERT INTO `stud_meta` VALUES (101,303,8697695321,'yki@gmail.com'),(102,301,9597695883,'nsb@gmail.com'),(103,302,8267692365,'abs@gmail.com'),(104,304,7654476342,'drm@gmail.com'),(105,305,923459678,'ens@gmail.com'),(106,306,8567845321,'fsj@gmail.com'),(107,307,7659835421,'gps@gmail.com');
+/*!40000 ALTER TABLE `stud_meta` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `subject_allocation`
+--
+
+DROP TABLE IF EXISTS `subject_allocation`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `subject_allocation` (
+  `allocation_id` int(20) NOT NULL,
+  `subject_id` int(20) NOT NULL,
+  `cur_sem` int(20) NOT NULL,
+  `course_id` int(20) NOT NULL
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `subject_allocation`
+--
+
+LOCK TABLES `subject_allocation` WRITE;
+/*!40000 ALTER TABLE `subject_allocation` DISABLE KEYS */;
+INSERT INTO `subject_allocation` VALUES (303,511,6,401),(303,513,6,401),(301,512,4,403),(301,514,4,403),(302,512,4,402),(302,514,4,402),(304,511,6,401),(304,513,6,401),(305,512,4,403),(305,514,4,403),(306,512,4,402),(306,514,4,402),(307,511,6,401),(307,513,6,401);
+/*!40000 ALTER TABLE `subject_allocation` ENABLE KEYS */;
+UNLOCK TABLES;
+
+--
+-- Table structure for table `subject_details`
+--
+
+DROP TABLE IF EXISTS `subject_details`;
+/*!40101 SET @saved_cs_client     = @@character_set_client */;
+/*!40101 SET character_set_client = utf8 */;
+CREATE TABLE `subject_details` (
+  `subject_id` int(20) NOT NULL,
+  `subject_code` int(20) NOT NULL,
+  `subject_name` varchar(40) NOT NULL,
+  PRIMARY KEY (`subject_id`)
+) ENGINE=InnoDB DEFAULT CHARSET=latin1;
+/*!40101 SET character_set_client = @saved_cs_client */;
+
+--
+-- Dumping data for table `subject_details`
+--
+
+LOCK TABLES `subject_details` WRITE;
+/*!40000 ALTER TABLE `subject_details` DISABLE KEYS */;
+INSERT INTO `subject_details` VALUES (511,901,'Computer Graphics'),(512,902,'Accountancy'),(513,903,'RDBMS'),(514,904,'Business Studies');
+/*!40000 ALTER TABLE `subject_details` ENABLE KEYS */;
+UNLOCK TABLES;
+/*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
+
+/*!40101 SET SQL_MODE=@OLD_SQL_MODE */;
+/*!40014 SET FOREIGN_KEY_CHECKS=@OLD_FOREIGN_KEY_CHECKS */;
+/*!40014 SET UNIQUE_CHECKS=@OLD_UNIQUE_CHECKS */;
+/*!40101 SET CHARACTER_SET_CLIENT=@OLD_CHARACTER_SET_CLIENT */;
+/*!40101 SET CHARACTER_SET_RESULTS=@OLD_CHARACTER_SET_RESULTS */;
+/*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
+/*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
+
+-- Dump completed on 2016-09-21 17:15:14
