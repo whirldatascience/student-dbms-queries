@@ -1,0 +1,527 @@
+To set Pass/Fail:
+mysql> use student;
+Database changed
+mysql> update
+   -> results
+   -> set
+   -> status=case when result='1' then 'Pass'
+   -> when result='0' then 'Fail'
+   -> else status
+   -> end
+   -> where result in('1','0');
+Query OK, 6 rows affected (0.05 sec)
+Rows matched: 6  Changed: 6  Warnings: 0
+
+mysql> select * from results;
++-----------+---------+-----------+--------------+-------+--------+--------+
+| result_id | stud_id | course_id | subject_code | grade | result | status |
++-----------+---------+-----------+--------------+-------+--------+--------+
+|       601 |     101 |       401 |          511 | A     |      1 | Pass   |
+|       601 |     101 |       401 |          513 | E     |      0 | Fail   |
+|       602 |     102 |       403 |          512 | A     |      1 | Pass   |
+|       602 |     102 |       403 |          514 | C     |      1 | Pass   |
+|       603 |     103 |       402 |          512 | E     |      0 | Fail   |
+
+|       603 |     103 |       402 |          514 | E     |      0 | Fail   |
++-----------+---------+-----------+--------------+-------+--------+--------+
+6 rows in set (0.00 sec)
+
+Total Pass/Fail percentage:
+
+Mysql> select result,count(result) as count,(count(result)/(select count(result) from results)) * 100 as percentage from results group by result;
+
++--------+-------+------------+
+| result | count | percentage |
++--------+-------+------------+
+|      0 |     2 |    33.3333 |
+|      1 |     4 |    66.6667 |
++--------+-------+------------+
+
+2 rows in set (0.00 sec)
+
+
+
+
+mysql> select status,(count(status)*100/(select count(*) from results)) as percentage from results where status='Pass' group by status;
++--------+------------+
+| status | percentage |
++--------+------------+
+| Pass   |    66.6667 |
++--------+------------+
+1 row in set (0.00 sec)
+
+mysql> select status,(count(status)*100/(select count(*) from results)) as percentage from results where status='Fail' group by status;
++--------+------------+
+| status | percentage |
++--------+------------+
+| Fail   |    33.3333 |
++--------+------------+
+1 row in set (0.00 sec)
+
+
+Total Pass/Fail Percentage of a Education Year:
+
+ mysql> select status,academic_year,(count(status)*100/(select count(*) from results)) as percentage from results inner join stud_master on results.stud_id=stud_master.stud_id where status='Pass' and stud_master.academic_year=2009 group by status;
++--------+---------------+------------+
+| status | academic_year | percentage |
++--------+---------------+------------+
+| Pass   |          2009 |    33.3333 |
++--------+---------------+------------+
+1 row in set (0.00 sec)
+
+Percentage of a Student:
+
+mysql> select stud_id,(sum(mark)/count(mark)) as Percentage from results group by stud_id;
++---------+------------+
+| stud_id | Percentage |
++---------+------------+
+|     101 |    62.5000 |
+|     102 |    75.0000 |
+|     103 |    50.0000 |
+|     104 |    75.0000 |
+|     105 |    32.5000 |
+|     106 |    52.5000 |
+|     107 |    75.0000 |
++---------+------------+
+7 rows in set (0.00 sec)
+
+mysql> select stud_id,(sum(mark)/count(mark)) as Percentage from results where stud_id=101 group by stud_id;
++---------+------------+
+| stud_id | Percentage |
++---------+------------+
+|     101 |    62.5000 |
++---------+------------+
+1 row in set (0.00 sec)
+
+To Get First 3 Ranks:
+
+mysql> select stud_id,(sum(mark)/count(mark)) as Percentage from results group by stud_id order by Percentage desc limit 3;
++---------+------------+
+| stud_id | Percentage |
++---------+------------+
+|     104 |    75.0000 |
+|     107 |    75.0000 |
+|     102 |    75.0000 |
++---------+------------+
+3 rows in set (0.00 sec)
+
+
+Where clause:
+
+mysql> select stud_id,course_id,subject_code,grade,status from results where result=1;
++---------+-----------+--------------+-------+--------+
+| stud_id | course_id | subject_code | grade | status |
++---------+-----------+--------------+-------+--------+
+|     101 |       401 |          511 | A     | Pass   |
+|     102 |       403 |          512 | A     | Pass   |
+|     102 |       403 |          514 | C     | Pass   |
++---------+-----------+--------------+-------+--------+
+3 rows in set (0.00 sec)
+
+mysql> select stud_reg_no,stud_name,admission_date,course_id,subject_code,grade,status from stud_master,results where stud_master.stud_id=results.stud_id;
++-------------+-----------+----------------+-----------+--------------+-------+--------+
+| stud_reg_no | stud_name | admission_date | course_id | subject_code | grade | status |
++-------------+-----------+----------------+-----------+--------------+-------+--------+
+|         811 | aaa       | 2009-07-22     |       401 |          511 | A     | Pass   |
+|         811 | aaa       | 2009-07-22     |       401 |          513 | E     | Fail   |
+|         812 | bbb       | 2012-08-20     |       403 |          512 | A     | Pass   |
+|         812 | bbb       | 2012-08-20     |       403 |          514 | C     | Pass   |
+|         813 | ccc       | 2015-05-13     |       402 |          512 | E     | Fail   |
+|         813 | ccc       | 2015-05-13     |       402 |          514 | E     | Fail   |
++-------------+-----------+----------------+-----------+--------------+-------+--------+
+6 rows in set (0.00 sec)
+
+OR Operator:
+mysql> select stud_id,course_id,subject_code,grade,status from results where result=1 or result=0;
++---------+-----------+--------------+-------+--------+
+| stud_id | course_id | subject_code | grade | status |
++---------+-----------+--------------+-------+--------+
+|     101 |       401 |          511 | A     | Pass   |
+|     101 |       401 |          513 | E     | Fail   |
+|     102 |       403 |          512 | A     | Pass   |
+|     102 |       403 |          514 | C     | Pass   |
+|     103 |       402 |          512 | E     | Fail   |
+|     103 |       402 |          514 | E     | Fail   |
++---------+-----------+--------------+-------+--------+
+6 rows in set (0.00 sec)
+
+AND Operator:
+
+mysql> select stud_id,course_id,subject_code,grade,status from results where result=1 and course_id=401;
++---------+-----------+--------------+-------+--------+
+| stud_id | course_id | subject_code | grade | status |
++---------+-----------+--------------+-------+--------+
+|     101 |       401 |          511 | A     | Pass   |
++---------+-----------+--------------+-------+--------+
+1 row in set (0.00 sec)
+
+Like Clause:
+
+mysql> select * from results where course_id like '40%';
++-----------+---------+-----------+--------------+-------+--------+--------+
+| result_id | stud_id | course_id | subject_code | grade | result | status |
++-----------+---------+-----------+--------------+-------+--------+--------+
+|       601 |     101 |       401 |          511 | A     |      1 | Pass   |
+|       601 |     101 |       401 |          513 | E     |      0 | Fail   |
+|       602 |     102 |       403 |          512 | A     |      1 | Pass   |
+|       602 |     102 |       403 |          514 | C     |      1 | Pass   |
+|       603 |     103 |       402 |          512 | E     |      0 | Fail   |
+|       603 |     103 |       402 |          514 | E     |      0 | Fail   |
++-----------+---------+-----------+--------------+-------+--------+--------+
+6 rows in set (0.00 sec)
+
+Top Clause:
+
+mysql> select * from results limit 3;
++-----------+---------+-----------+--------------+-------+--------+--------+
+| result_id | stud_id | course_id | subject_code | grade | result | status |
++-----------+---------+-----------+--------------+-------+--------+--------+
+|       601 |     101 |       401 |          511 | A     |      1 | Pass   |
+|       601 |     101 |       401 |          513 | E     |      0 | Fail   |
+|       602 |     102 |       403 |          512 | A     |      1 | Pass   |
++-----------+---------+-----------+--------------+-------+--------+--------+
+3 rows in set (0.00 sec)
+
+Order By:
+
+mysql> select * from results order by result_id desc;
++-----------+---------+-----------+--------------+-------+--------+--------+
+| result_id | stud_id | course_id | subject_code | grade | result | status |
++-----------+---------+-----------+--------------+-------+--------+--------+
+|       603 |     103 |       402 |          512 | E     |      0 | Fail   |
+|       603 |     103 |       402 |          514 | E     |      0 | Fail   |
+|       602 |     102 |       403 |          512 | A     |      1 | Pass   |
+|       602 |     102 |       403 |          514 | C     |      1 | Pass   |
+|       601 |     101 |       401 |          511 | A     |      1 | Pass   |
+|       601 |     101 |       401 |          513 | E     |      0 | Fail   |
++-----------+---------+-----------+--------------+-------+--------+--------+
+6 rows in set (0.00 sec)
+
+Group By:
+
+mysql> select stud_name,father_name from stud_master group by father_name;
++-----------+-------------+
+| stud_name | father_name |
++-----------+-------------+
+| ccc       | mmm         |
+| aaa       | sss         |
+| bbb       | yyy         |
++-----------+-------------+
+3 rows in set (0.03 sec)
+
+Distinct Keyword:
+
+mysql> select subject_code from results order by subject_code;
++--------------+
+| subject_code |
++--------------+
+|          511 |
+|          512 |
+|          512 |
+|          513 |
+|          514 |
+|          514 |
++--------------+
+6 rows in set (0.00 sec)
+
+mysql> select distinct subject_code from results order by subject_code;
++--------------+
+| subject_code |
++--------------+
+|          511 |
+|          512 |
+|          513 |
+|          514 |
++--------------+
+4 rows in set (0.00 sec)
+
+Sorting Results:
+
+mysql> select * from stud_master order by(case stud_id
+   -> when 101 then 1
+   -> else 100 end)asc, stud_id desc;
++---------+-------------+-----------+------------+-------------+-------------+-------------+----------------+
+| stud_id | stud_reg_no | stud_name | dob        | father_name | mother_name | blood_group | admission_date |
++---------+-------------+-----------+------------+-------------+-------------+-------------+----------------+
+|     101 |         811 | aaa       | 1992-09-23 | sss         | rrr         | B+ve        | 2009-07-22     |
+|     103 |         813 | ccc       | 1995-01-02 | mmm         | jjj         | A+ve        | 2015-05-13     |
+|     102 |         812 | bbb       | 1990-07-10 | yyy         | lll         | O+ve        | 2012-08-20     |
++---------+-------------+-----------+------------+-------------+-------------+-------------+----------------+
+3 rows in set (0.00 sec)
+
+
+Inner Join:
+
+mysql> select stud_reg_no,stud_name,dob,admission_date,course_id,subject_code,grade,result,status from stud_master inner join results on stud_master.stud_id=results.stud_id where result=1;
++-------------+-----------+------------+----------------+-----------+--------------+-------+--------+--------+
+| stud_reg_no | stud_name | dob        | admission_date | course_id | subject_code | grade | result | status |
++-------------+-----------+------------+----------------+-----------+--------------+-------+--------+--------+
+|         811 | aaa       | 1992-09-23 | 2009-07-22     |       401 |          511 | A     |      1 | Pass   |
+|         812 | bbb       | 1990-07-10 | 2012-08-20     |       403 |          512 | A     |      1 | Pass   |
+|         812 | bbb       | 1990-07-10 | 2012-08-20     |       403 |          514 | C     |      1 | Pass   |
++-------------+-----------+------------+----------------+-----------+--------------+-------+--------+--------+
+3 rows in set (0.08 sec)
+
+
+Left Join:
+
+mysql> select stud_reg_no,stud_name,dob,admission_date,course_id,subject_code,grade,result,status from stud_master left join results on stud_master.stud_id=results.stud_id;
++-------------+-----------+------------+----------------+-----------+--------------+-------+--------+--------+
+| stud_reg_no | stud_name | dob        | admission_date | course_id | subject_code | grade | result | status |
++-------------+-----------+------------+----------------+-----------+--------------+-------+--------+--------+
+|         811 | aaa       | 1992-09-23 | 2009-07-22     |       401 |          511 | A     |      1 | Pass   |
+|         811 | aaa       | 1992-09-23 | 2009-07-22     |       401 |          513 | E     |      0 | Fail   |
+|         812 | bbb       | 1990-07-10 | 2012-08-20     |       403 |          512 | A     |      1 | Pass   |
+|         812 | bbb       | 1990-07-10 | 2012-08-20     |       403 |          514 | C     |      1 | Pass   |
+|         813 | ccc       | 1995-01-02 | 2015-05-13     |       402 |          512 | E     |      0 | Fail   |
+|         813 | ccc       | 1995-01-02 | 2015-05-13     |       402 |          514 | E     |      0 | Fail   |
++-------------+-----------+------------+----------------+-----------+--------------+-------+--------+--------+
+6 rows in set (0.00 sec)
+
+
+
+Right Join:
+
+mysql> select stud_reg_no,stud_name,dob,admission_date,course_id,subject_code,grade,result,status from stud_master right join results on stud_master.stud_id=results.stud_id;
++-------------+-----------+------------+----------------+-----------+--------------+-------+--------+--------+
+| stud_reg_no | stud_name | dob        | admission_date | course_id | subject_code | grade | result | status |
++-------------+-----------+------------+----------------+-----------+--------------+-------+--------+--------+
+|         811 | aaa       | 1992-09-23 | 2009-07-22     |       401 |          511 | A     |      1 | Pass   |
+|         811 | aaa       | 1992-09-23 | 2009-07-22     |       401 |          513 | E     |      0 | Fail   |
+|         812 | bbb       | 1990-07-10 | 2012-08-20     |       403 |          512 | A     |      1 | Pass   |
+|         812 | bbb       | 1990-07-10 | 2012-08-20     |       403 |          514 | C     |      1 | Pass   |
+|         813 | ccc       | 1995-01-02 | 2015-05-13     |       402 |          512 | E     |      0 | Fail   |
+|         813 | ccc       | 1995-01-02 | 2015-05-13     |       402 |          514 | E     |      0 | Fail   |
++-------------+-----------+------------+----------------+-----------+--------------+-------+--------+--------+
+6 rows in set (0.00 sec)
+
+Full Join:
+
+mysql> select stud_reg_no,stud_name,dob,admission_date,course_id,subject_code,grade,result,status from stud_master left join results on stud_master.stud_id=results.stud_id
+    -> union all
+    -> select stud_reg_no,stud_name,dob,admission_date,course_id,subject_code,grade,result,status from stud_master right join results on stud_master.stud_id=results.stud_id;
++-------------+-----------+------------+----------------+-----------+--------------+-------+--------+--------+
+| stud_reg_no | stud_name | dob        | admission_date | course_id | subject_code | grade | result | status |
++-------------+-----------+------------+----------------+-----------+--------------+-------+--------+--------+
+|         811 | aaa       | 1992-09-23 | 2009-07-22     |       401 |          511 | A     |      1 | Pass   |
+|         811 | aaa       | 1992-09-23 | 2009-07-22     |       401 |          513 | E     |      0 | Fail   |
+|         812 | bbb       | 1990-07-10 | 2012-08-20     |       403 |          512 | A     |      1 | Pass   |
+|         812 | bbb       | 1990-07-10 | 2012-08-20     |       403 |          514 | C     |      1 | Pass   |
+|         813 | ccc       | 1995-01-02 | 2015-05-13     |       402 |          512 | E     |      0 | Fail   |
+|         813 | ccc       | 1995-01-02 | 2015-05-13     |       402 |          514 | E     |      0 | Fail   |
+|         811 | aaa       | 1992-09-23 | 2009-07-22     |       401 |          511 | A     |      1 | Pass   |
+|         811 | aaa       | 1992-09-23 | 2009-07-22     |       401 |          513 | E     |      0 | Fail   |
+|         812 | bbb       | 1990-07-10 | 2012-08-20     |       403 |          512 | A     |      1 | Pass   |
+|         812 | bbb       | 1990-07-10 | 2012-08-20     |       403 |          514 | C     |      1 | Pass   |
+|         813 | ccc       | 1995-01-02 | 2015-05-13     |       402 |          512 | E     |      0 | Fail   |
+|         813 | ccc       | 1995-01-02 | 2015-05-13     |       402 |          514 | E     |      0 | Fail   |
++-------------+-----------+------------+----------------+-----------+--------------+-------+--------+--------+
+12 rows in set (0.00 sec)
+
+Cartesian Join:
+
+mysql> select stud_reg_no,stud_name,dob,admission_date,course_id,subject_code,grade,result,status from stud_master,results;
++-------------+-----------+------------+----------------+-----------+--------------+-------+--------+--------+
+| stud_reg_no | stud_name | dob        | admission_date | course_id | subject_code | grade | result | status |
++-------------+-----------+------------+----------------+-----------+--------------+-------+--------+--------+
+|         811 | aaa       | 1992-09-23 | 2009-07-22     |       401 |          511 | A     |      1 | Pass   |
+|         812 | bbb       | 1990-07-10 | 2012-08-20     |       401 |          511 | A     |      1 | Pass   |
+|         813 | ccc       | 1995-01-02 | 2015-05-13     |       401 |          511 | A     |      1 | Pass   |
+|         811 | aaa       | 1992-09-23 | 2009-07-22     |       401 |          513 | E     |      0 | Fail   |
+|         812 | bbb       | 1990-07-10 | 2012-08-20     |       401 |          513 | E     |      0 | Fail   |
+|         813 | ccc       | 1995-01-02 | 2015-05-13     |       401 |          513 | E     |      0 | Fail   |
+|         811 | aaa       | 1992-09-23 | 2009-07-22     |       403 |          512 | A     |      1 | Pass   |
+|         812 | bbb       | 1990-07-10 | 2012-08-20     |       403 |          512 | A     |      1 | Pass   |
+|         813 | ccc       | 1995-01-02 | 2015-05-13     |       403 |          512 | A     |      1 | Pass   |
+|         811 | aaa       | 1992-09-23 | 2009-07-22     |       403 |          514 | C     |      1 | Pass   |
+|         812 | bbb       | 1990-07-10 | 2012-08-20     |       403 |          514 | C     |      1 | Pass   |
+|         813 | ccc       | 1995-01-02 | 2015-05-13     |       403 |          514 | C     |      1 | Pass   |
+|         811 | aaa       | 1992-09-23 | 2009-07-22     |       402 |          512 | E     |      0 | Fail   |
+|         812 | bbb       | 1990-07-10 | 2012-08-20     |       402 |          512 | E     |      0 | Fail   |
+|         813 | ccc       | 1995-01-02 | 2015-05-13     |       402 |          512 | E     |      0 | Fail   |
+|         811 | aaa       | 1992-09-23 | 2009-07-22     |       402 |          514 | E     |      0 | Fail   |
+|         812 | bbb       | 1990-07-10 | 2012-08-20     |       402 |          514 | E     |      0 | Fail   |
+|         813 | ccc       | 1995-01-02 | 2015-05-13     |       402 |          514 | E     |      0 | Fail   |
++-------------+-----------+------------+----------------+-----------+--------------+-------+--------+--------+
+18 rows in set (0.00 sec)
+
+
+Union Clause:
+
+mysql> select stud_reg_no,stud_name,dob,course_id,subject_id,grade,result,status from stud_master left join results on stud_master.stud_id=results.stud_id where result=1
+    -> union
+    -> select stud_reg_no,stud_name,dob,course_id,subject_id,grade,result,status from stud_master right join results on stud_master.stud_id=results.stud_id where result=0;
++-------------+-----------+------------+-----------+------------+-------+--------+--------+
+| stud_reg_no | stud_name | dob        | course_id | subject_id | grade | result | status |
++-------------+-----------+------------+-----------+------------+-------+--------+--------+
+|         811 | aaa       | 1992-09-23 |       401 |        511 | A     |      1 | Pass   |
+|         812 | bbb       | 1990-07-10 |       403 |        512 | A     |      1 | Pass   |
+|         812 | bbb       | 1990-07-10 |       403 |        514 | C     |      1 | Pass   |
+|         811 | aaa       | 1992-09-23 |       401 |        513 | E     |      0 | Fail   |
+|         813 | ccc       | 1995-01-02 |       402 |        512 | E     |      0 | Fail   |
+|         813 | ccc       | 1995-01-02 |       402 |        514 | E     |      0 | Fail   |
++-------------+-----------+------------+-----------+------------+-------+--------+--------+
+6 rows in set (0.00 sec)
+
+Union All:
+
+mysql> select stud_reg_no,stud_name,dob,course_id,subject_id,grade,result,status from stud_master left join results on stud_master.stud_id=results.stud_id
+    -> union all
+    -> select stud_reg_no,stud_name,dob,course_id,subject_id,grade,result,status from stud_master right join results on stud_master.stud_id=results.stud_id;
++-------------+-----------+------------+-----------+------------+-------+--------+--------+
+| stud_reg_no | stud_name | dob        | course_id | subject_id | grade | result | status |
++-------------+-----------+------------+-----------+------------+-------+--------+--------+
+|         811 | aaa       | 1992-09-23 |       401 |        511 | A     |      1 | Pass   |
+|         811 | aaa       | 1992-09-23 |       401 |        513 | E     |      0 | Fail   |
+|         812 | bbb       | 1990-07-10 |       403 |        512 | A     |      1 | Pass   |
+|         812 | bbb       | 1990-07-10 |       403 |        514 | C     |      1 | Pass   |
+|         813 | ccc       | 1995-01-02 |       402 |        512 | E     |      0 | Fail   |
+|         813 | ccc       | 1995-01-02 |       402 |        514 | E     |      0 | Fail   |
+|         811 | aaa       | 1992-09-23 |       401 |        511 | A     |      1 | Pass   |
+|         811 | aaa       | 1992-09-23 |       401 |        513 | E     |      0 | Fail   |
+|         812 | bbb       | 1990-07-10 |       403 |        512 | A     |      1 | Pass   |
+|         812 | bbb       | 1990-07-10 |       403 |        514 | C     |      1 | Pass   |
+|         813 | ccc       | 1995-01-02 |       402 |        512 | E     |      0 | Fail   |
+|         813 | ccc       | 1995-01-02 |       402 |        514 | E     |      0 | Fail   |
++-------------+-----------+------------+-----------+------------+-------+--------+--------+
+12 rows in set (0.00 sec)
+
+
+Alias:
+
+Table alias:
+
+mysql> select s.stud_id,s.stud_reg_no,s.stud_name,s.dob,m.contact_no,m.email_id from stud_master as s, stud_meta as m where s.stud_id=m.stud_id;
++---------+-------------+-----------+------------+------------+---------------+
+| stud_id | stud_reg_no | stud_name | dob        | contact_no | email_id      |
++---------+-------------+-----------+------------+------------+---------------+
+|     101 |         811 | aaa       | 1992-09-23 | 8697695321 | yki@gmail.com |
+|     102 |         812 | bbb       | 1990-07-10 | 9597695883 | nsb@gmail.com |
+|     103 |         813 | ccc       | 1995-01-02 | 8267692365 | abs@gmail.com |
++---------+-------------+-----------+------------+------------+---------------+
+3 rows in set (0.00 sec)
+
+
+Column alias:
+
+mysql> select stud_id as s_id, stud_name as name from stud_master;
++------+------+
+| s_id | name |
++------+------+
+|  101 | aaa  |
+|  102 | bbb  |
+|  103 | ccc  |
++------+------+
+3 rows in set (0.00 sec)
+
+Count Functions:
+
+mysql> select count(result_id) from results;
++------------------+
+| count(result_id) |
++------------------+
+|                8 |
++------------------+
+1 row in set (0.00 sec)
+
+mysql> select count(result_id) from results where result=1;
++------------------+
+| count(result_id) |
++------------------+
+|                5 |
++------------------+
+1 row in set (0.00 sec)
+
+
+Max command:
+
+mysql> select max(result_id) from results;
++----------------+
+| max(result_id) |
++----------------+
+|            604 |
++----------------+
+1 row in set (0.00 sec)
+
+
+
+
+
+
+Set Command:
+
+mysql> update results set status='Pass' where result_id='604';_
+Query OK, 2 rows affected (0.11 sec)
+Rows matched: 2  Changed: 2  Warnings: 0
+
+mysql> select * from results;
++-----------+---------+-----------+------------+-------+--------+--------+
+| result_id | stud_id | course_id | subject_id | grade | result | status |
++-----------+---------+-----------+------------+-------+--------+--------+
+|       601 |     101 |       401 |        511 | A     |      1 | Pass   |
+|       601 |     101 |       401 |        513 | E     |      0 | Fail   |
+|       602 |     102 |       403 |        512 | A     |      1 | Pass   |
+|       602 |     102 |       403 |        514 | C     |      1 | Pass   |
+|       603 |     103 |       402 |        512 | E     |      0 | Fail   |
+|       603 |     103 |       402 |        514 | E     |      0 | Fail   |
+|       604 |     104 |       404 |        515 | A     |      1 | Pass   |
+|       604 |     104 |       404 |        516 | B     |      1 | Pass   |
++-----------+---------+-----------+------------+-------+--------+--------+
+8 rows in set (0.00 sec)
+
+
+IN Command:
+
+mysql> select * from results where status in ('Pass');
++-----------+---------+-----------+------------+-------+--------+--------+
+| result_id | stud_id | course_id | subject_id | grade | result | status |
++-----------+---------+-----------+------------+-------+--------+--------+
+|       601 |     101 |       401 |        511 | A     |      1 | Pass   |
+|       602 |     102 |       403 |        512 | A     |      1 | Pass   |
+|       602 |     102 |       403 |        514 | C     |      1 | Pass   |
+|       604 |     104 |       404 |        515 | A     |      1 | Pass   |
+|       604 |     104 |       404 |        516 | B     |      1 | Pass   |
++-----------+---------+-----------+------------+-------+--------+--------+
+5 rows in set (0.00 sec)
+
+
+To Calculate Average of a Student Mark:
+
+mysql> select * from results;
++-----------+---------+-----------+------------+------+-------+--------+--------+
+| result_id | stud_id | course_id | subject_id | mark | grade | result | status |
++-----------+---------+-----------+------------+------+-------+--------+--------+
+|       601 |     101 |       401 |        511 |   85 | A     |      1 | Pass   |
+|       601 |     101 |       401 |        513 |   40 | E     |      0 | Fail   |
+|       602 |     102 |       403 |        512 |   90 | A     |      1 | Pass   |
+|       602 |     102 |       403 |        514 |   60 | C     |      1 | Pass   |
+|       603 |     103 |       402 |        512 |   40 | E     |      0 | Fail   |
+|       603 |     103 |       402 |        514 |   35 | E     |      0 | Fail   |
++-----------+---------+-----------+------------+------+-------+--------+--------+
+6 rows in set (0.00 sec)
+
+mysql> select avg(mark) from results where result_id=601;
++-----------+
+| avg(mark) |
++-----------+
+|   62.5000 |
++-----------+
+1 row in set (0.00 sec)
+
+mysql> select stud_reg_no,result_id,course_id,avg(mark) as average from stud_master join results on stud_master.stud_id=results.stud_id where results.stud_id=101;
++-------------+-----------+-----------+---------+
+| stud_reg_no | result_id | course_id | average |
++-------------+-----------+-----------+---------+
+|         811 |       601 |       401 | 62.5000 |
++-------------+-----------+-----------+---------+
+1 row in set (0.00 sec)
+
+Academic Pass Percentage:
+
+mysql> select (count(result)/count(*)) * 100 as percentage from results where result='1' group by result;
++------------+
+| percentage |
++------------+
+|   100.0000 |
++------------+
+1 row in set (0.00 sec)
